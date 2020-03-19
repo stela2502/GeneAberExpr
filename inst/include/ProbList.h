@@ -130,7 +130,8 @@ public:
 
 	ProbList () {};
 
-	ProbList (Eigen::SparseMatrix<double> data,  std::vector<int>A; std::vector<int>B, double range ) 
+	ProbList (Eigen::SparseMatrix<double> data,  
+		std::vector<int>A; std::vector<int>B, std::vector<double> range ) 
 	{
 		if ( range.size() != 10 ) {
 			::Rf_error("the ranges length needs to be exactly 10!" );
