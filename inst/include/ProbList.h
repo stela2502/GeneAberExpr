@@ -24,7 +24,7 @@ public:
 		}
 	};
 
-	pos4val ( double val ){
+	int pos4val ( double val ){
 		for (int i =0; i< this->order.size(); i++){
 			if ( this->start[i] <= val & this->order.size() == i+1 ){
 				this->lastVal = val;
@@ -77,14 +77,18 @@ public:
 		this->prob[state] = tmp;
 		fixOrder();
 	}
-
+	// this return value will be logged in the ProbList
 	double Prob_4_value ( double val, int state) {
 		if ( this->lastVal == val ){
 			return ( this->proA[ this->lastID ] );
 		}
-		this->pro[state][ pos4val( val ) ];
+		return(this->pro[state][ pos4val( val ) ]);
 	};
+	void print( ) {
+		
+		Rcout << "A c++ ProbEntry object containing:"  << std::endl;
 
+	}
 
 private:
 	std::vector<double> tmp;
@@ -123,19 +127,45 @@ public:
 
 	std::vector<ProbEntry> list;
 	TransmissionProb transmissionProb;
-	double startProbability;
-	double endProbability;
-	double probability_for_change_to_state_A;
-	double probability_for_change_to_state_B;
+
+	std::vector<string> states;
+
 	//a vector of chars with max 10 entries...
 	std::vector<std::string> states;
 
 	ProbList () {};
 
+
 	void estimate( Eigen::SparseMatrix<double> data, std::vector<double> range, std::string name ){
 		this->states.push_back( name );
 
 		this->list.reserve( data.innerSize() );
+		std::vector<double> D (data.outerSize());
+
+		Rcout << "estimating probabilities for state " << state << std::endl;
+		Progress p(data.innerSize(), true);
+
+		data = data.transpose();
+
+		for ( int c_=0; c_ < data.outerSize(); ++c_ ){
+			std::fill(D.begin(), D.end(), 0.0);
+			for (Eigen::SparseMatrix<double>::InnerIterator it(X, c_); it; ++it){
+				D[it.row()] =  it.value();
+			}
+			list[i]=ProbEntry( range ) ;
+			this->list[c_].estimate( D, this->states.size() );
+			p.increment();
+		}
+	}
+
+	void estimate( Eigen::SparseMatrix<double> data, std::vector<int> cols,
+		std::vector<double> range, std::string name ){
+		this->states.push_back( name );
+
+		this->list.reserve( data.innerSize() );
+		std::vector<double> D (data.outerSize());
+		std::vector<double> A ( col.size() );
+
 		Rcout << "estimating probabilities for state " << state << std::endl;
 		Progress p(data.innerSize(), true);
 		data = data.transpose();
@@ -145,18 +175,36 @@ public:
 			for (Eigen::SparseMatrix<double>::InnerIterator it(X, c_); it; ++it){
 				D[it.row()] =  it.value();
 			}
+			for ( int i =0; i < col.size(); i++){
+				A[i] = D[col[i]]; 
+			}
 			list[i]=ProbEntry( range ) ;
-			this->list[c_].estimate( D, this->states.size()-1 );
+			this->list[c_].estimate( A, this->states.size() );
 			p.increment();
 		}
 	}
-
 	double Prob_4_value ( int i, double val, int state) {
-		return (list[i].Prob_4_value( val, state ));
+		return (log(list[i].Prob_4_value( val, state )));
 	};
 	double Prob_4_value ( double val, int state) {
-		return (list[0].Prob_4_value( val, state ));
+		return (log (list[0].Prob_4_value( val, state )) );
 	};
+	void print (){
+		Rcout << "A c++ ProbList object containing"  << std::endl;
+		Rcout << "Transition probabitlities for states:"  << std::endl;
+		Rcout << std::ostream_iterator<double>( this->states, " ") << std::endl;
+		this->transmissionProb.print();
+		Rcout << "prob distributions (n="<< this->list.size()<<  "):" << std::endl;		
+		for ( int i = 0; i < 5; i++) {
+			this->list[i].print(i);
+		}
+		for ( int i = 0; i < 5; i++) {
+			Rcout << "   ." << std::endl;
+		}
+		for ( int i = this->list.size()-5; i < this->list.size(); i++) {
+			this->list[i].print(i);
+		}
+	}
 };
 
 class TransmissionProb{
@@ -181,14 +229,22 @@ public:
 		this.transitionProb[from] = pVals;
 	};
 	double getTransmissionProb( int from, int to){
-		this.transitionProb[from][to];
+		return( log(this.transitionProb[from][to]));
 	};
 	double getStartProb( int state ) {
-		this.startProbability[state];
+		return ( log( this.startProbability[state]));
 	};
 	double getEndProb( int state ) {
-		this.endProbability[state];
+		return ( log(this.endProbability[state]));
 	};
+	void print() {
+		Rcout << "A c++ TransmissionProb object containing:"  << std::endl;
+		Rcout << "Start probabilities: "  << std::ostream_iterator<double>( this->startProbability, " ") << std::endl;
+		for ( int i =0; i < this->transitionProb.size() ){
+			std::ostream_iterator<double>( this->transitionProb[i], " ") << std::endl;
+		}
+		Rcout << "End probabilities: "  << std::ostream_iterator<double>( this->endProbability, " ") << std::endl;
+	}
 
 private:
 	std::vector<double> startProbability;

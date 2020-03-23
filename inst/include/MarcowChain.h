@@ -8,8 +8,9 @@ public:
 	std::vector<std::vector<double>> forwardResults;
 	std::vector<std::vector<double>> backwardResults;
 	std::vector<std::vector<double>> a_H;
+	std::vector<std::vector<double>> p_H;
 	std::vector<double> C;
-	
+	double p_value_summ;
 
 	NumericMatrix run ( Eigen::SparseMatrix<double> data, ProbList model ){
 		/*$
@@ -52,9 +53,11 @@ public:
 		
 		for ( int i =1 ;i < chain.size(); i ++ ) {
 
-			std::fill(this->forwardResults[i].begin(), this->forwardResults[i].end(), 1.0);
 			for ( state = 0; state < model.states.seize(); state ++ ) {
-				for ( from = 0; from < model.states.seize(); from ++ ) {
+				this->forwardResults[i][state][0] = 
+					model.transmissionProb.getTransmissionProb( 0, state )  +
+					this->forwardResults[i-1][0];
+				for ( from = 1; from < model.states.seize(); from ++ ) {
 					this->forwardResults[i][state] = Add2Logs(
 						this->forwardResults[i][state] , 
 						model.transmissionProb.getTransmissionProb( from, state )  
@@ -83,7 +86,10 @@ public:
 
 			std::fill(this->backwardResults[i].begin(), this->backwardResults[i].end(), 1.0);
 			for ( state = 0; state <  model.states.size(); state ++) {
-				for ( from = 0; from < model.states.seize(); from ++ ) {
+				this->backwardResults[i][state][0] = 
+					model.transmissionProb.getTransmissionProb( 0, state )  +
+					this->forwardResults[i+1][0];
+				for ( from = 1; from < model.states.seize(); from ++ ) {
 					this->backwardResults[i][state] = Add2Logs(
 						this->backwardResults[i][state] , 
 						model.transmissionProb.getTransmissionProb( from, state )  
@@ -97,8 +103,31 @@ public:
  
 	}
 
-	void CalculateTotalProbabilityFromStartToEnd( std::vector<double> chain ) {
+	void CalculateTotalProbabilityFromStartToEnd( std::vector<double> chain,  ProbList model  ) {
+		this->a_H.reserve( chain.size() );
+		this->p_H.reserve( chain.size() );
+		
+		int i;
+		int state;
+		int a;
 
+		for ( i = 0; i < chain.size(); i++) {
+			this->a_H[i].reserve(model.states.size());
+			this->p_H[i].reserve(model.states.size());
+		}
+		this->C.reserve( chain.size());
+		for ( int i =0; i < chain.sitze(); i++ ){
+			for ( state = 0; state < model.states.size(); state ++) {
+				this->a_H[i][state] = this->forwardResults[i][state] + this->backwardResults[i][state];
+			}
+			this->C[i] = this->a_H[i][0];
+			for ( a = 1; a < chain.sitze(); a++) {
+				this->C[i] = Add2Logs(this->C[i], this->a_H[i][0]);
+			}
+			for ( state = 0; state < model.states.size(); state ++) {
+				this->p_H[i][state] = this->a_H[i][state] - this->C[i];
+			}
+		}
 	}
 
 	double Add2Logs (double logA, double logB ) {
