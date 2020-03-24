@@ -3,10 +3,17 @@ Type: Package
 Title: Processes chromosomal slice summary expression data 
 Version: 1.0
 Date: 2020-03-19
-Author: Your Name
-Maintainer: Your Name <your@email.com>
-Description: This tool identifies chromosomal aberations based on single cell expression data. The data needs to previousely be summed up over certain genomic areas.
-Internally it need two lists of vaguely known informations like healthy and cancer cell ids. It will then use the data from these cells to infere expectations about each chromosomal area and will use a HMM algorithm to identify single healthy or cancer cells in the data. In a later step the chromosomal anormalities of 'the cancer cells' are accessed.
+Author: Stefan Lang
+Maintainer: Stefan Lang <stefan.lang@med.lu.se>
+Description: This tool identifies chromosomal aberations based on single cell expression
+   Data. The data needs to previousely be summed up over certain genomic areas.   Internally it need two lists of vaguely known informations like healthy and cancer cell ids. It will then use the data from these cells to infere expectations about each chromosomal area and will use a HMM algorithm to identify single healthy or cancer cells in the data. In a later step the chromosomal anormalities of 'the cancer cells' are accessed.
 License: GPL (>= 2)
-Imports: Rcpp (>= 1.0.4)
-LinkingTo: Rcpp
+Imports: 
+	Rcpp (>= 1.0.4),
+	Matrix
+LinkingTo: 
+	Rcpp,
+	RcppEigen, 
+    RcppProgress
+Suggests: 
+    testthat

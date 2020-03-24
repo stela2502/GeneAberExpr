@@ -2,3 +2,5 @@
 //#define RCPP_GeneAberExpr_H_GEN_
 
 #include "ProbList.h"
+
+#include "MarcowChain.h"
