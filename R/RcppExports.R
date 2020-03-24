@@ -4,16 +4,31 @@
 #' @title IdentifyStates tries to infere cell states from a sparse Matrix and a list of example cells.
 #' @aliases IdentifyStates,GeneAberExpr-method
 #' @rdname IdentifyStates
-#' @description Mased on the example data a model for each genomic area is developed
+#' @description Based on the example data a model for each genomic area is developed.
 #' Based on these per area models the probability to be in either of these states is calculated.
 #' @param X the sparse matrix (tests are applied to columns!)
 #' @param range the starting points in the size distribution of the data (10!!)
 #' @param interest row IDs for the group of interest
 #' @param background row IDS for the background
-#' @return a matrix with the HMM internals (at the moment)
+#' @return a matrix with the probabilites for each region to be in 'interest' state.
 #' @export
 IdentifyStates <- function(data, range, interest, background) {
     .Call(`_GeneAberExpr_IdentifyStates`, data, range, interest, background)
+}
+
+#' @title IdentifyStatesTest Test version of 'IdentifyStates' returing both state probabilites for the first cell.
+#' @aliases IdentifyStatesTest,GeneAberExpr-method
+#' @rdname IdentifyStatesTest
+#' @description Based on the example data a model for each genomic area is developed.
+#' Based on these per area models the probability to be in either of these states is calculated.
+#' @param X the sparse matrix (tests are applied to columns!)
+#' @param range the starting points in the size distribution of the data (10!!)
+#' @param interest row IDs for the group of interest
+#' @param background row IDS for the background
+#' @return a matrix with the probabilites for each region to be in 'interest' state.
+#' @export
+IdentifyStatesTest <- function(data, range, interest, background) {
+    .Call(`_GeneAberExpr_IdentifyStatesTest`, data, range, interest, background)
 }
 
 #' @title GetTestModel runs sthe estimation only and returns a matrix
