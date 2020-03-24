@@ -8,12 +8,12 @@
 using namespace Rcpp;
 
 // IdentifyStates
-NumericMatrix IdentifyStates(Eigen::MappedSparseMatrix<double> data, std::vector<double> range, std::vector<int> interest, std::vector<int> background);
+NumericMatrix IdentifyStates(Eigen::SparseMatrix<double> data, std::vector<double> range, std::vector<int> interest, std::vector<int> background);
 RcppExport SEXP _GeneAberExpr_IdentifyStates(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Eigen::MappedSparseMatrix<double> >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double> >::type data(dataSEXP);
     Rcpp::traits::input_parameter< std::vector<double> >::type range(rangeSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type interest(interestSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type background(backgroundSEXP);
@@ -35,10 +35,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// IceCreamTest
+NumericMatrix IceCreamTest();
+RcppExport SEXP _GeneAberExpr_IceCreamTest() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(IceCreamTest());
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_GeneAberExpr_IdentifyStates", (DL_FUNC) &_GeneAberExpr_IdentifyStates, 4},
     {"_GeneAberExpr_GetTestModel", (DL_FUNC) &_GeneAberExpr_GetTestModel, 4},
+    {"_GeneAberExpr_IceCreamTest", (DL_FUNC) &_GeneAberExpr_IceCreamTest, 0},
     {NULL, NULL, 0}
 };
 

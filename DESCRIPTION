@@ -17,3 +17,4 @@ LinkingTo:
     RcppProgress
 Suggests: 
     testthat
+RoxygenNote: 7.1.0

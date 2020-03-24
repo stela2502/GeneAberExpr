@@ -31,3 +31,14 @@ GetTestModel <- function(data, range, interest, background) {
     .Call(`_GeneAberExpr_GetTestModel`, data, range, interest, background)
 }
 
+#' @title IceCreamTest processes the Ice cream HMM example
+#' @aliases IceCreamTest,GeneAberExpr-method
+#' @rdname IceCreamTest
+#' @description the publication 'An Interactive Spreadsheet for Teaching the Forward-Backward Algorithm'
+#' is a beatuful example of how to calculate an HMM. This function re-runs the excel data.
+#' @return a matrix with the HMM internals (at the moment)
+#' @export
+IceCreamTest <- function() {
+    .Call(`_GeneAberExpr_IceCreamTest`)
+}
+

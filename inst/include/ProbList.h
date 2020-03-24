@@ -35,10 +35,35 @@ public:
 		}
 	};
 
+	void prepareIceCream(){
+		// start has already been set!		
+		this->start.reserve(10);
+		for ( int i = 1; i < 11; i++ ){
+			//Rcout << "ading ice start "<< i << " at id " << i-1 <<std::endl;
+			this->start[i-1] = i;
+		}
 
+		this->prob.reserve( 2 * this->s );
+		for ( int i = 0; i < 2 * this->s; i++){
+			this->prob.push_back(0.0);
+		}
+		this->prob[ pos4val(1,0) ] = 0.7;
+		this->prob[ pos4val(2,0) ] = 0.2;
+		this->prob[ pos4val(3,0) ] = 0.1;
+		this->prob[ pos4val(1,1) ] = 0.1;
+		this->prob[ pos4val(2,1) ] = 0.2;
+		this->prob[ pos4val(3,1) ] = 0.7;
+
+	}
 	int pos4val ( double val, int state ){
 		if (  this->start.size() != 10 ){
 			// first time usage...
+			Rcout << "I currently have "<<this->start.size()<<
+				" start positions - not the correct number of 10!" <<std::endl;
+			for ( int i = 0; i < this->start.size(); i ++ ) {
+				Rcout << this->start[i]<<" ";
+			}
+			Rcout <<std::endl;
 			::Rf_error("object not initialized correctly - starts are empty / too many!? ");
 		}
 
@@ -119,9 +144,6 @@ public:
 	};
 	// this return value will be logged in the ProbList
 	double Prob_4_value ( double val, int state) {
-		if ( this->lastVal == val ){
-			return ( this->prob[ this->lastID ] );
-		}
 		return(this->prob[ pos4val( val, state ) ]);
 	};
 	void print( ) {
@@ -145,7 +167,6 @@ public:
 	};
 
 private:
-	std::vector<double> tmp;
 	//these two get set in the fixOrder call:
 	int lastID;
 	double lastVal;
@@ -198,9 +219,13 @@ public:
 		this->startProbability.resize(states);
 		this->endProbability.resize(states);
 		this->transitionProb.resize(states* states);
-		std::fill(this->startProbability.begin(), this->startProbability.end(), 0.0 );
-		std::fill(this->endProbability.begin(), this->endProbability.end(), 0.0 );
-		std::fill(this->transitionProb.begin(), this->transitionProb.end(), 0.0 );
+		for ( int i = 0; i < states; i++) {
+			this->startProbability.push_back(0.0);
+			this->endProbability.push_back(0.0);
+		}
+		for ( int i = 0; i < states * states; i++) {
+			this->transitionProb.push_back(0.0);
+		}
 	};
 	void setStart ( std::vector<double> starts ) {
 		this->startProbability = starts;
@@ -231,7 +256,20 @@ public:
 		//}
 		//Rcout << "End probabilities: "  << std::ostream_iterator<double>( 
 	//		this->endProbability, " ") << std::endl;
+	};
+	void prepareIceCream(){
+		// 0 == C and 1 == H
+		this->startProbability[0] = 0.5;
+		this->startProbability[1] = 0.5;
+		this->endProbability[0] = 0.1;
+		this->endProbability[1] = 0.1;
+		std::fill(this->transitionProb.begin(),  this->transitionProb.end(), 0.0);
+		this->transitionProb[ position( 0,0) ] = 0.8;
+		this->transitionProb[ position( 1,1) ] = 0.8;
+		this->transitionProb[ position( 0,1) ] = 0.1;
+		this->transitionProb[ position( 1,0) ] = 0.1;
 	}
+
 
 private:
 	std::vector<double> startProbability;
@@ -257,8 +295,31 @@ public:
 	std::vector<std::string> states;
 
 
-	ProbList () {
-	};
+	ProbList () {};
+
+	//method to fill the obejct with the ice cream data
+	void prepareIceCream () {
+		this->states.reserve(2);
+		this->states.push_back("Hot");
+		this->states.push_back("Cold");
+		this->list.reserve( 33 );
+		std::vector<double> range {1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0} ;
+		for ( int i =0; i< 33; i++) {
+			this->list.push_back(new ProbEntry( range ));
+			//Rcout << "ProbEntry add to object "<<i << " size: " << this->list.size() << std::endl;
+			this->list[ i ]-> prepareIceCream();
+		}
+		//Rcout << "ProbEntry locations -> "; 
+		//for ( int i = 0; i < 33; i++){
+		//	Rcout << this->list[i] << " ";
+		//}
+		//Rcout << std::endl;
+		
+		this->transmissionProb = new TransmissionProb(2);
+		this->transmissionProb->prepareIceCream();
+		//print();
+	}
+
 
 	NumericMatrix as_Matrix ( ) {
 
@@ -271,12 +332,12 @@ public:
 			for ( int state = 0; state < this->states.size(); state++) {
 				//Rcout << "result line " << r_ << " of " << this->list.size() * this->states.size()<< std::endl;
 				for ( int id = 0; id < 10; id ++){
+					//Rcout << "   result line "<< r_ << " and id "<< id <<std::endl;
 					ret(r_, id) = this->list[i]->prob[ this->list[i]->pos4val( range[id], state)];
 				}
 				r_ ++;
 			}
 		}
-		//Rcout << "finished" << std::endl;
 		return (ret);
 	};
 
@@ -284,7 +345,14 @@ public:
 		std::string name ){
 		this->states.push_back( name );
 
-		this->list.reserve( data.innerSize() );
+		if (this->list.size() < data.innerSize() ){
+			this->list.reserve( data.innerSize() );
+			for ( int i =this->list.size(); i < data.innerSize(); i++){
+				this->list.push_back( new ProbEntry(range) ) ;
+			}
+		}
+		
+
 		std::vector<double> D (data.outerSize());
 
 		Rcout << "estimating probabilities for state " << name << std::endl;
@@ -297,10 +365,7 @@ public:
 			for (Eigen::SparseMatrix<double>::InnerIterator it(data, c_); it; ++it){
 				D[it.row()] =  it.value();
 			}
-			ProbEntry tmp = ProbEntry( range );
-			this->list.push_back( &tmp ) ;
 			this->list[c_]->estimate( D, this->states.size()-1 );
-			
 		}
 
 		data = data.transpose();
