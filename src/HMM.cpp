@@ -59,9 +59,9 @@ NumericMatrix IdentifyStates ( Eigen::MappedSparseMatrix<double> data, std::vect
 
 	for ( int c_ = 0; c_< data.outerSize(); ++c_ ) {
 		std::fill(D.begin(), D.end(), 0.0);
-		for (Eigen::SparseMatrix<double>::InnerIterator it(data, c_); it; ++it){
+		/*for (Eigen::SparseMatrix<double>::InnerIterator it(data, c_); it; ++it){
 			D[it.row()] =  it.value();
-		}
+		}*/
 		ret = mc->run( D, model);
 		return (ret);
 	}
