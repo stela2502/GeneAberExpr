@@ -2,4 +2,4 @@
 doc/.~*
 src/*.so
 src/*.o
-*.R*
+*.R[Dh]*

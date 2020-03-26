@@ -1,0 +1,10 @@
+^CRAN-RELEASE$
+^revdep$
+^RcppTestArea\.Rproj$
+^\.Rproj\.user$
+/bad
+scratchbord
+ForceCrash.R
+X.RData
+cran-comments.md
+scripts
