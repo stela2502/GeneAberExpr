@@ -59,12 +59,25 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// goodGenes
+std::vector<bool> goodGenes(Eigen::SparseMatrix<double> data, double max);
+RcppExport SEXP _GeneAberExpr_goodGenes(SEXP dataSEXP, SEXP maxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::SparseMatrix<double> >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< double >::type max(maxSEXP);
+    rcpp_result_gen = Rcpp::wrap(goodGenes(data, max));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_GeneAberExpr_IdentifyStates", (DL_FUNC) &_GeneAberExpr_IdentifyStates, 4},
     {"_GeneAberExpr_IdentifyStatesTest", (DL_FUNC) &_GeneAberExpr_IdentifyStatesTest, 4},
     {"_GeneAberExpr_GetTestModel", (DL_FUNC) &_GeneAberExpr_GetTestModel, 4},
     {"_GeneAberExpr_IceCreamTest", (DL_FUNC) &_GeneAberExpr_IceCreamTest, 0},
+    {"_GeneAberExpr_goodGenes", (DL_FUNC) &_GeneAberExpr_goodGenes, 2},
     {NULL, NULL, 0}
 };
 

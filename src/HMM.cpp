@@ -53,14 +53,16 @@ NumericMatrix IdentifyStates ( Eigen::SparseMatrix<double> data, std::vector<dou
 	start = {0.00001, 0.9};
 	model->transmissionProb->setState ( 1, start);
 
-	NumericMatrix ret( data.innerSize(), data.outerSize() );
 	NumericMatrix tmp;
 	MarcowChain* mc;
 	Rcout << "Create MarcowChain object " << std::endl;
 	mc = new MarcowChain ( data.innerSize(), 2);
 	std::vector<double>D ( data.innerSize() );
 
-	Progress p(data.outerSize(), true);
+	int modFac = data.outerSize()/100;
+	Progress p( round(data.outerSize() / modFac), true);
+
+	NumericMatrix ret( data.innerSize(), data.outerSize());
 	
 	for ( int c_ = 0;  c_ < data.outerSize(); ++c_ ) {
 		std::fill(D.begin(), D.end(), 0.0);
@@ -72,7 +74,10 @@ NumericMatrix IdentifyStates ( Eigen::SparseMatrix<double> data, std::vector<dou
 		for ( int i = 0; i < data.innerSize(); i++){
 			ret(i, c_) = tmp(i,0);
 		}
-		p.increment();
+		if ( c_ % modFac == 0) {
+			p.increment();
+		}
+		
 	}
 
 	return ( ret );
@@ -219,6 +224,35 @@ NumericMatrix IceCreamTest ( ){
 	//Rcout << "Process iteration 1" << mc->chainLength << std::endl;
 
 	ret = mc->run( ice, model, true ); // test returning all internal values
+
+	return ( ret ) ;
+}
+
+
+//' @title goodGenes processes the Ice cream HMM example
+//' @aliases goodGenes,GeneAberExpr-method
+//' @rdname goodGenes
+//' @description check in the sparse matrix if at least 40% of the row values are less than max
+//' @return bool vector of rows with less than 40% over max columns.
+//' @export
+// [[Rcpp::export]]
+std::vector<bool> goodGenes (Eigen::SparseMatrix<double> data, double max ){
+
+	data = data.transpose();
+
+	std::vector<bool> ret( data.outerSize() );
+	//Rcout << "dims outer: " << data.outerSize() << " ; inner: " << data.innerSize() << std::endl;
+
+	int out;
+	for ( int c_ = 0;  c_ < data.outerSize(); ++c_ ) {
+		out = 0;
+		for (Eigen::SparseMatrix<double>::InnerIterator it(data, c_); it; ++it){
+			if (it.value() > max ){
+				out ++;
+			}
+		}
+		ret[c_] = static_cast<double>(out) / data.innerSize() < 0.4;	
+	}
 
 	return ( ret ) ;
 }

@@ -57,3 +57,13 @@ IceCreamTest <- function() {
     .Call(`_GeneAberExpr_IceCreamTest`)
 }
 
+#' @title goodGenes processes the Ice cream HMM example
+#' @aliases goodGenes,GeneAberExpr-method
+#' @rdname goodGenes
+#' @description check in the sparse matrix if at least 40% of the row values are less than max
+#' @return bool vector of rows with less than 40% over max columns.
+#' @export
+goodGenes <- function(data, max) {
+    .Call(`_GeneAberExpr_goodGenes`, data, max)
+}
+

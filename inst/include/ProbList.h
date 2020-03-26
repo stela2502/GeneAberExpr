@@ -86,15 +86,17 @@ public:
 		//Rcout << "filling ProbEntry with size "<<  this->s << 
 		//" and values size "<< values.size() << " for starte " << state <<std::endl;
 		
-		this->prob.reserve( state * this->s );
-		for ( int i = this->prob.size(); i <state * this->s; i ++ ){
-			this->prob.push_back(0.0);
+		if ( this->prob.size() < state * this->s ){
+			this->prob.reserve( state * this->s );
+			for ( int i = this->prob.size(); i <state * this->s; i ++ ){
+				this->prob.push_back(0.0);
+			}
 		}
 		//this->print();
 		std::vector<double> tmp (this->s);
 		std::vector<double> prob (this->s);
 
-		std::fill(tmp.begin(), tmp.end(), 0.0 );
+		std::fill(tmp.begin(), tmp.end(), 1e-9 );
 		double sum = 0.0;
 		int i;
 		// fill an initial table
@@ -111,7 +113,8 @@ public:
 		sum = tmp[0]+ static_cast<double>(tmp[this->s]);
 		min= tmp[this->s]; // educated guess here -really
 		for( i = 1; i < this->s -1; i ++) {
-			tmp[i] = (tmp[i] + tmp[i-1] + tmp[i+1]) / 3;
+			//the smoothing might be a horrible idea...
+			//tmp[i] = (tmp[i] + tmp[i-1] + tmp[i+1]) / 3;
 			sum += tmp[i];
 			if ( min > tmp[i] ){
 				min = tmp[i];
@@ -120,23 +123,13 @@ public:
 		//Rcout << "rescaled and smoothed the table"  << std::endl;
 		for ( i = 0; i < this->s; i++ ){
 			//Rcout << "(prob[i] - min)" << (prob[i] - min) << " / sum " <<  sum << "+ 1e-9" << std::endl;
-			tmp[i] = (tmp[i] - min) / sum + 1e-9 ; //we can not have 0 values later on!
+			tmp[i] = (tmp[i] - min) / sum  ; //we can not have 0 values later on!
 		}
 
 
 		//Rcout << "add the probabilites at "  << state << std::endl;
 		for ( int i = 0; i < this->s; i++ ){
-			//try{
 			this->prob.at(pos4val( this->start[i], state) ) = tmp[i];
-  			/*
-  			}
-  			catch (const std::out_of_range& oor) {
-	  			this->prob.push_back(tmp[i]);
-	  			Rcout << "prob.push_back(tmp[i]) "  << tmp[i] << " at i " << 
-	  			i << "( size="<<this->prob.size() << "; position=" << 
-	  			pos4val( this->start[i], state) <<")" <<std::endl;
-			}
-			*/
 		}
 		//Rcout << "correct size?" << this->prob.size() <<  std::endl;
 		//print();
@@ -172,38 +165,6 @@ private:
 	double lastVal;
 
 	void fixOrder() {
-		/*
-		std::vector<paired> pairs;
-		pairs.reserve(this->s);
-		int i;
-
-		for ( i = 0; i < this->s; i++ ){
-			double sum = 0.0;
-			for ( int state =0; state< this->prob.size(); state++){
-				sum += this->prob[state][i];
-			}
-			pairs.push_back(std::make_pair(i, sum) );
-		}		
-
-		std::sort(pairs.begin(), pairs.end(), [](const std::pair<int,int> &left, const std::pair<int,int> &right) {
-		    return left.second > right.second;
-			}
-		);
-
-		Rcout << "new order: ";
-
-		for ( i = 0; i < this->s; i++ ){
-			try {
-				this->order.at(i) = pairs[i].first;
-  			}
-  			catch (const std::out_of_range& oor) {
-  				this->order.push_back(pairs[i].first);
-			}
-			Rcout << this->order[i]<< " " ;
-
-		}
-		Rcout << std::endl;
-		*/
 		this->lastID= 0;
 		this->lastVal = (this->start[0] + this->start[1])/2;
 	};
@@ -343,16 +304,17 @@ public:
 
 	void estimate( Eigen::SparseMatrix<double> data, std::vector<double> range, 
 		std::string name ){
+		this->states.reserve(this->states.size() +1 );
 		this->states.push_back( name );
 
 		if (this->list.size() < data.innerSize() ){
+			// initialize the whole model
 			this->list.reserve( data.innerSize() );
 			for ( int i =this->list.size(); i < data.innerSize(); i++){
 				this->list.push_back( new ProbEntry(range) ) ;
 			}
 		}
 		
-
 		std::vector<double> D (data.outerSize());
 
 		Rcout << "estimating probabilities for state " << name << std::endl;
@@ -410,7 +372,7 @@ public:
 			for ( int i =0; i < cols.size(); i++){
 				A[i] = D[cols[i]]; 
 			}
-			//this->list.at(c_)->estimate( A, this->states.size()-1);
+			this->list.at(c_)->estimate( A, this->states.size()-1);
 			try {
 				//Rcout << "At position " << c_ << std::endl;
 				//this->list.at(c_)->print();
