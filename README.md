@@ -3,7 +3,8 @@ The main purpose of this package is to asigne chromosomal slice mean expression 
 Both classes should also be present in the data.
 Probability structures per chromosomal area will be created and every cell will be processed using these criteria.
 
-The core is not even finished (coding started 2020:03:19)
+The HMM does work as tested with the IceCone test data. Re-estimation of the probability functions has not been part of the aime here and therefore it is not implemented.
 
-Hope to be finished in about one week.
+The results need more polish to actually be usable.
+
 
