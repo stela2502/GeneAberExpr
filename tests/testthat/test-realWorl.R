@@ -5,6 +5,8 @@ if ( ! file.exists( '~/NAS/MattiasMagnusson/Pavan_Prabhala/Seq8/chr3.chrSums.RDa
 	skip('example file not found')
 }
 
+skip('too time consuming and outdated')
+
 calcQuality <- function(id){
 	 sum((model[id,] - model[id+1,])^2)
 }

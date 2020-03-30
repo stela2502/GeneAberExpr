@@ -6,7 +6,7 @@
 \alias{calcQuality,GeneAberExpr-method}
 \title{description of function calcQuality}
 \usage{
-calcQuality(x)
+calcQuality(model)
 }
 \arguments{
 \item{model}{the model matrix obtained from a GetTestModel() run.}
