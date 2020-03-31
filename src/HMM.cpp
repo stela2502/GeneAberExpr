@@ -108,7 +108,7 @@ NumericMatrix IdentifyStatesTest ( Eigen::SparseMatrix<double> data, std::vector
 	a = "Background";
 	model->estimate( data, background, range, a );
 
-	model->transmissionProb = new TransmissionProb( 1 );
+	model->transmissionProb = new TransmissionProb( 2 );
 	//transmissionProb
 	std::vector<double> start = {0.5, 0.5};
 	model->transmissionProb->setStart ( start );
@@ -169,9 +169,10 @@ NumericMatrix GetTestModel ( Eigen::MappedSparseMatrix<double> data, std::vector
 
 	//model->print();
 
-	model->transmissionProb = new TransmissionProb( 1 );
+	model->transmissionProb = new TransmissionProb( 2 );
 	//transmissionProb
 	std::vector<double> start = {0.5, 0.5};
+	//Rcout << "add starts vector of size " << start.size()<<  std::endl;
 	model->transmissionProb->setStart ( start );
 	model->transmissionProb->setEnd   ( start );
 	// from Interest to Interest and to Background

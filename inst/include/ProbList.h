@@ -177,6 +177,7 @@ public:
 
 	TransmissionProb() {};
 	TransmissionProb( int states) {
+		this->size = states;
 		this->startProbability.resize(states);
 		this->endProbability.resize(states);
 		this->transitionProb.resize(states* states);
@@ -189,6 +190,10 @@ public:
 		}
 	};
 	void setStart ( std::vector<double> starts ) {
+		if ( this->size != starts.size() ){
+			 Rcout << "TransmissionProb not initialized correctly " << this->size << " != " << starts.size()<< std::endl;
+			::Rf_error( "<- ERROR" );
+		}
 		this->startProbability = starts;
 	};
 	void setEnd ( std::vector<double> ends ) {
@@ -236,6 +241,7 @@ private:
 	std::vector<double> startProbability;
 	std::vector<double> endProbability;
 	std::vector<double> transitionProb;
+	int size;
 	int position( int from, int to ) {
 		int states;
 		states = this->startProbability.size();
@@ -361,7 +367,7 @@ public:
 		Progress p(data.innerSize(), true);
 		data = data.transpose();
 
-		//Rcout << "just before the for loop " << std::endl;
+		Rcout << "just before the for loop " << std::endl;
 		//this->print();
 
 		for ( int c_=0; c_ < data.outerSize(); ++c_ ){
@@ -389,9 +395,7 @@ public:
 		}
 
 		//Rcout << "results prob functions length " << this->list[0]->prob.size() << std::endl;
-		
-
-		//Rcout << "state " << name << " finished" << std::endl;
+		Rcout << "state " << name << " finished" << std::endl;
 	};
 	double Prob_4_value ( int i, double val, int state) {
 		return (log(list[i]->Prob_4_value( val, state )));
