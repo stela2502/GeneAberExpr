@@ -26,22 +26,23 @@ typedef Eigen::SparseMatrix<double>::InnerIterator SpMatIt;
 //' @param range the starting points in the size distribution of the data (10!!)
 //' @param interest row IDs for the group of interest
 //' @param background row IDS for the background
+//' @param phony print status messages (default false)
 //' @return a matrix with the probabilites for each region to be in 'interest' state.
 //' @export
 // [[Rcpp::export]]
 NumericMatrix IdentifyStates ( Eigen::SparseMatrix<double> data, std::vector<double> range,  std::vector<int> interest,
-		std::vector<int> background ){
+		std::vector<int> background, bool phony ){
 
 	ProbList* model = new ProbList(); // 10 by default!
 	Rcout << "estimating 'interest' probability functions " << std::endl;
 	std::string a ="interest";
-	model->estimate( data, interest, range, a );
+	model->estimate( data, interest, range, a, phony );
 
 	Rcout << "estimating 'background' probability functions " << std::endl;
 	a = "Background";
-	model->estimate( data, background, range, a );
+	model->estimate( data, background, range, a, phony );
 
-	model->transmissionProb = new TransmissionProb( 1 );
+	model->transmissionProb = new TransmissionProb( 2 );
 	//transmissionProb
 	std::vector<double> start = {0.5, 0.5};
 	model->transmissionProb->setStart ( start );
@@ -93,20 +94,21 @@ NumericMatrix IdentifyStates ( Eigen::SparseMatrix<double> data, std::vector<dou
 //' @param range the starting points in the size distribution of the data (10!!)
 //' @param interest row IDs for the group of interest
 //' @param background row IDS for the background
+//' @param phony print status messages (default false)
 //' @return a matrix with the probabilites for each region to be in 'interest' state.
 //' @export
 // [[Rcpp::export]]
 NumericMatrix IdentifyStatesTest ( Eigen::SparseMatrix<double> data, std::vector<double> range,  std::vector<int> interest,
-		std::vector<int> background ){
+		std::vector<int> background, bool phony ){
 
 	ProbList* model = new ProbList(); // 10 by default!
 	Rcout << "estimating 'interest' probability functions " << std::endl;
 	std::string a ="interest";
-	model->estimate( data, interest, range, a );
+	model->estimate( data, interest, range, a, phony );
 
 	Rcout << "estimating 'background' probability functions " << std::endl;
 	a = "Background";
-	model->estimate( data, background, range, a );
+	model->estimate( data, background, range, a , phony);
 
 	model->transmissionProb = new TransmissionProb( 2 );
 	//transmissionProb
@@ -148,24 +150,29 @@ NumericMatrix IdentifyStatesTest ( Eigen::SparseMatrix<double> data, std::vector
 //' @param range the starting points in the size distribution of the data (10!!)
 //' @param interest row IDs for the group of interest
 //' @param background row IDS for the background
+//' @param phony print status messages (default false)
 //' @return a matrix with the HMM internals (at the moment)
 //' @export
 // [[Rcpp::export]]
 NumericMatrix GetTestModel ( Eigen::MappedSparseMatrix<double> data, std::vector<double> range,  std::vector<int> interest,
-		std::vector<int> background ){
+		std::vector<int> background, bool phony){
+
 
 	ProbList* model = new ProbList(); // 10 by default!
-	Rcout << "estimating 'interest' probability functions " << std::endl;
+	if ( phony ){
+		Rcout << "estimating 'interest' probability functions " << std::endl;
+	}
 	std::string a ="interest";
-	model->estimate( data, interest, range, a );
+	model->estimate( data, interest, range, a, phony );
 
 	//model->list.at(1)->print();
 
 	//model->print();
-
-	Rcout << "estimating 'background' probability functions " << std::endl;
+	if ( phony ){
+		Rcout << "estimating 'background' probability functions " << std::endl;
+	}
 	a = "Background";
-	model->estimate( data, background, range, a );
+	model->estimate( data, background, range, a, phony );
 
 	//model->print();
 

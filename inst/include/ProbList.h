@@ -309,7 +309,7 @@ public:
 	};
 
 	void estimate( Eigen::SparseMatrix<double> data, std::vector<double> range, 
-		std::string name ){
+		std::string name, bool phony ){
 		this->states.reserve(this->states.size() +1 );
 		this->states.push_back( name );
 
@@ -322,8 +322,9 @@ public:
 		}
 		
 		std::vector<double> D (data.outerSize());
-
-		Rcout << "estimating probabilities for state " << name << std::endl;
+		if ( phony ) {
+			Rcout << "estimating probabilities for state " << name << std::endl;
+		}
 		//Progress p(data.innerSize(), true);
 
 		data = data.transpose();
@@ -341,7 +342,7 @@ public:
 
 
 	void estimate( Eigen::SparseMatrix<double> data, std::vector<int> cols,
-		std::vector<double> range, std::string name ){
+		std::vector<double> range, std::string name, bool phony ){
 		
 		if ( this->states.size() == 0 ){
 			this->list.reserve( data.innerSize() );
@@ -356,18 +357,19 @@ public:
 		std::vector<double> D (data.outerSize());
 		std::vector<double> A ( cols.size() );
 
-		Rcout << "estimating probabilities for state " << name << " ("<< this->states.size() << ")" << std::endl;
-		
+		if ( phony ) {
+			Rcout << "estimating probabilities for state " << name << " ("<< this->states.size() << ")" << std::endl;
+		}
 		/*
 		if ( this->states.size() > 1 ){
 			this->list.at(0)->print();
 		}
 		*/
 
-		Progress p(data.innerSize(), true);
+		Progress p(data.innerSize(), phony);
 		data = data.transpose();
 
-		Rcout << "just before the for loop " << std::endl;
+		//Rcout << "just before the for loop " << std::endl;
 		//this->print();
 
 		for ( int c_=0; c_ < data.outerSize(); ++c_ ){
@@ -395,7 +397,7 @@ public:
 		}
 
 		//Rcout << "results prob functions length " << this->list[0]->prob.size() << std::endl;
-		Rcout << "state " << name << " finished" << std::endl;
+		//Rcout << "state " << name << " finished" << std::endl;
 	};
 	double Prob_4_value ( int i, double val, int state) {
 		return (log(list[i]->Prob_4_value( val, state )));

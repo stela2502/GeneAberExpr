@@ -10,10 +10,11 @@
 #' @param range the starting points in the size distribution of the data (10!!)
 #' @param interest row IDs for the group of interest
 #' @param background row IDS for the background
+#' @param phony print status messages (default false)
 #' @return a matrix with the probabilites for each region to be in 'interest' state.
 #' @export
-IdentifyStates <- function(data, range, interest, background) {
-    .Call(`_GeneAberExpr_IdentifyStates`, data, range, interest, background)
+IdentifyStates <- function(data, range, interest, background, phony) {
+    .Call(`_GeneAberExpr_IdentifyStates`, data, range, interest, background, phony)
 }
 
 #' @title IdentifyStatesTest Test version of 'IdentifyStates' returing both state probabilites for the first cell.
@@ -25,10 +26,11 @@ IdentifyStates <- function(data, range, interest, background) {
 #' @param range the starting points in the size distribution of the data (10!!)
 #' @param interest row IDs for the group of interest
 #' @param background row IDS for the background
+#' @param phony print status messages (default false)
 #' @return a matrix with the probabilites for each region to be in 'interest' state.
 #' @export
-IdentifyStatesTest <- function(data, range, interest, background) {
-    .Call(`_GeneAberExpr_IdentifyStatesTest`, data, range, interest, background)
+IdentifyStatesTest <- function(data, range, interest, background, phony) {
+    .Call(`_GeneAberExpr_IdentifyStatesTest`, data, range, interest, background, phony)
 }
 
 #' @title GetTestModel runs sthe estimation only and returns a matrix
@@ -40,10 +42,11 @@ IdentifyStatesTest <- function(data, range, interest, background) {
 #' @param range the starting points in the size distribution of the data (10!!)
 #' @param interest row IDs for the group of interest
 #' @param background row IDS for the background
+#' @param phony print status messages (default false)
 #' @return a matrix with the HMM internals (at the moment)
 #' @export
-GetTestModel <- function(data, range, interest, background) {
-    .Call(`_GeneAberExpr_GetTestModel`, data, range, interest, background)
+GetTestModel <- function(data, range, interest, background, phony) {
+    .Call(`_GeneAberExpr_GetTestModel`, data, range, interest, background, phony)
 }
 
 #' @title IceCreamTest processes the Ice cream HMM example

@@ -8,8 +8,8 @@
 using namespace Rcpp;
 
 // IdentifyStates
-NumericMatrix IdentifyStates(Eigen::SparseMatrix<double> data, std::vector<double> range, std::vector<int> interest, std::vector<int> background);
-RcppExport SEXP _GeneAberExpr_IdentifyStates(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP) {
+NumericMatrix IdentifyStates(Eigen::SparseMatrix<double> data, std::vector<double> range, std::vector<int> interest, std::vector<int> background, bool phony);
+RcppExport SEXP _GeneAberExpr_IdentifyStates(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP, SEXP phonySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -17,13 +17,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::vector<double> >::type range(rangeSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type interest(interestSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type background(backgroundSEXP);
-    rcpp_result_gen = Rcpp::wrap(IdentifyStates(data, range, interest, background));
+    Rcpp::traits::input_parameter< bool >::type phony(phonySEXP);
+    rcpp_result_gen = Rcpp::wrap(IdentifyStates(data, range, interest, background, phony));
     return rcpp_result_gen;
 END_RCPP
 }
 // IdentifyStatesTest
-NumericMatrix IdentifyStatesTest(Eigen::SparseMatrix<double> data, std::vector<double> range, std::vector<int> interest, std::vector<int> background);
-RcppExport SEXP _GeneAberExpr_IdentifyStatesTest(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP) {
+NumericMatrix IdentifyStatesTest(Eigen::SparseMatrix<double> data, std::vector<double> range, std::vector<int> interest, std::vector<int> background, bool phony);
+RcppExport SEXP _GeneAberExpr_IdentifyStatesTest(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP, SEXP phonySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -31,13 +32,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::vector<double> >::type range(rangeSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type interest(interestSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type background(backgroundSEXP);
-    rcpp_result_gen = Rcpp::wrap(IdentifyStatesTest(data, range, interest, background));
+    Rcpp::traits::input_parameter< bool >::type phony(phonySEXP);
+    rcpp_result_gen = Rcpp::wrap(IdentifyStatesTest(data, range, interest, background, phony));
     return rcpp_result_gen;
 END_RCPP
 }
 // GetTestModel
-NumericMatrix GetTestModel(Eigen::MappedSparseMatrix<double> data, std::vector<double> range, std::vector<int> interest, std::vector<int> background);
-RcppExport SEXP _GeneAberExpr_GetTestModel(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP) {
+NumericMatrix GetTestModel(Eigen::MappedSparseMatrix<double> data, std::vector<double> range, std::vector<int> interest, std::vector<int> background, bool phony);
+RcppExport SEXP _GeneAberExpr_GetTestModel(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP, SEXP phonySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -45,7 +47,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::vector<double> >::type range(rangeSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type interest(interestSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type background(backgroundSEXP);
-    rcpp_result_gen = Rcpp::wrap(GetTestModel(data, range, interest, background));
+    Rcpp::traits::input_parameter< bool >::type phony(phonySEXP);
+    rcpp_result_gen = Rcpp::wrap(GetTestModel(data, range, interest, background, phony));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -73,9 +76,9 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_GeneAberExpr_IdentifyStates", (DL_FUNC) &_GeneAberExpr_IdentifyStates, 4},
-    {"_GeneAberExpr_IdentifyStatesTest", (DL_FUNC) &_GeneAberExpr_IdentifyStatesTest, 4},
-    {"_GeneAberExpr_GetTestModel", (DL_FUNC) &_GeneAberExpr_GetTestModel, 4},
+    {"_GeneAberExpr_IdentifyStates", (DL_FUNC) &_GeneAberExpr_IdentifyStates, 5},
+    {"_GeneAberExpr_IdentifyStatesTest", (DL_FUNC) &_GeneAberExpr_IdentifyStatesTest, 5},
+    {"_GeneAberExpr_GetTestModel", (DL_FUNC) &_GeneAberExpr_GetTestModel, 5},
     {"_GeneAberExpr_IceCreamTest", (DL_FUNC) &_GeneAberExpr_IceCreamTest, 0},
     {"_GeneAberExpr_goodGenes", (DL_FUNC) &_GeneAberExpr_goodGenes, 2},
     {NULL, NULL, 0}

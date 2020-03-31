@@ -5,7 +5,7 @@
 \alias{GetTestModel,GeneAberExpr-method}
 \title{GetTestModel runs sthe estimation only and returns a matrix}
 \usage{
-GetTestModel(data, range, interest, background)
+GetTestModel(data, range, interest, background, phony)
 }
 \arguments{
 \item{range}{the starting points in the size distribution of the data (10!!)}
@@ -13,6 +13,8 @@ GetTestModel(data, range, interest, background)
 \item{interest}{row IDs for the group of interest}
 
 \item{background}{row IDS for the background}
+
+\item{phony}{print status messages (default false)}
 
 \item{X}{the sparse matrix (tests are applied to columns!)}
 }

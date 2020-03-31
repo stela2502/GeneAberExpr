@@ -12,7 +12,7 @@ expect_equal( table(goodGenes(testD, max)), table( c(rep( FALSE, 37) , rep(TRUE,
 
 testD= testD[ goodGenes(testD, max),]
 
-model = GetTestModel( testD, seq( min, max,(max - min)/9 ) ,as.integer(1:100), as.integer(101:200))
+model = GetTestModel( testD, seq( min, max,(max - min)/9 ) ,as.integer(1:100), as.integer(101:200), phony=TRUE)
 
 
 calcCancerCount2 <- function(x) {
@@ -28,7 +28,8 @@ expect_true ( round(sum(calcQuality (model) ),4) ==  268.7359)
 #plot(1:10, res[1,], col='red', t='l')
 #lines(res[2,], col='green')
 
-res1 = IdentifyStatesTest( testD, seq( min, max,(max - min)/9 ) ,as.integer(1:100), as.integer(101:200))
+res1 = IdentifyStatesTest( testD, seq( min, max,(max - min)/9 ) ,
+	as.integer(1:100), as.integer(101:200), TRUE)
 
 load(file.path( prefix,'data','red.RData'))
 
@@ -39,7 +40,8 @@ expect_equal( res1, res, label = 'HMM real live results')
 
 skip("not test relevant")
 
-res2 = IdentifyStates( testD, seq( min, max,(max - min)/9 ) ,as.integer(1:100), as.integer(101:200))
+res2 = IdentifyStates( testD, seq( min, max,(max - min)/9 ) ,
+	as.integer(1:100), as.integer(101:200), TRUE)
 cancerCount = calcCancerCount(res2 )
 
 boxplot( split( cancerCount, c(rep('cancer', 100), rep('healthy', 100))), main="Full Model")
