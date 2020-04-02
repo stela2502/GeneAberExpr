@@ -19,7 +19,8 @@
 #'
 #' @docType package
 #' @name GeneAberExpr
-#' @useDynLib GeneAberExpr, .registration=TRUE
+#' @useDynLib GeneAberExpr
+
 NULL;
 
 #' @importFrom Rcpp evalCpp

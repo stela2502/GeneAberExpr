@@ -1,13 +1,12 @@
-#include "../inst/include/GeneAberExpr.h"
+
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <progress.hpp>
 #include <math.h>
 
-using namespace Rcpp;
+#include "../inst/include/GeneAberExpr.h"
 
-typedef Eigen::SparseMatrix<double>::InnerIterator SpMatIt; 
 
 // here I need to allow R to run a HMM analysis.
 // I need the forwards/backward and all other HMM algorithms in place here and work on sparse matrices.
@@ -175,7 +174,10 @@ NumericMatrix GetTestModel ( Eigen::MappedSparseMatrix<double> data, std::vector
 	model->estimate( data, background, range, a, phony );
 
 	//model->print();
-
+	if ( phony ){
+		model->list.at(0)->print();
+		Rcout << "create TransmissionProb object" << std::endl;
+	}
 	model->transmissionProb = new TransmissionProb( 2 );
 	//transmissionProb
 	std::vector<double> start = {0.5, 0.5};
@@ -188,7 +190,10 @@ NumericMatrix GetTestModel ( Eigen::MappedSparseMatrix<double> data, std::vector
 	// from Background to Interest and to Background
 	start = {0.00001, 0.9};
 	model->transmissionProb->setState ( 1, start);
-
+	if ( phony ){
+		model->list.at(0)->print();
+		Rcout << "prepare result matrix" << std::endl;
+	}
 	NumericMatrix ret;
 	ret = model->as_Matrix();
 	return ( ret ) ;

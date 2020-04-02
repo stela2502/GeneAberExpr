@@ -5,7 +5,7 @@
 \alias{IdentifyStatesTest,GeneAberExpr-method}
 \title{IdentifyStatesTest Test version of 'IdentifyStates' returing both state probabilites for the first cell.}
 \usage{
-IdentifyStatesTest(data, range, interest, background)
+IdentifyStatesTest(data, range, interest, background, phony)
 }
 \arguments{
 \item{range}{the starting points in the size distribution of the data (10!!)}
@@ -13,6 +13,8 @@ IdentifyStatesTest(data, range, interest, background)
 \item{interest}{row IDs for the group of interest}
 
 \item{background}{row IDS for the background}
+
+\item{phony}{print status messages (default false)}
 
 \item{X}{the sparse matrix (tests are applied to columns!)}
 }
