@@ -1,29 +1,11 @@
-#include "../inst/include/GeneAberExpr.h"
+#include "MarcowChain.h"
 
 MarcowChain::MarcowChain() {
-	::Rf_error("Use the other constructor wuth chainLength and states..");
+	Rcpp::stop("Use the other constructor with chainLength and states..");
 }
 
 MarcowChain::MarcowChain( int chainLength, int hiddenStates ) {
-	int total = chainLength*hiddenStates;
-	//Rcout << "prepare Object with long and short vectors: " << total << " ;"<< 
-	//  chainLength << std::endl;
-	this->chainLength = chainLength;
-	this->forwardResults.reserve( total );
-	this->backwardResults.reserve( total );
-	this->a_H.reserve( total );
-	this->p_H.reserve( total );
-	this->C.reserve( chainLength );
-	double null = 0.0;
-	for ( int i = this->forwardResults.size(); i < total; i++ ){
-		 this->forwardResults.push_back( null );
-		 this->backwardResults.push_back( null );
-		 this->a_H.push_back( null );
-		 this->p_H.push_back( null );
-	}
-	for ( int i = this->C.size(); i < chainLength; i++ ) {
-		this->C.push_back( null );
-	}
+	setup( chainLength, hiddenStates);
 	//Rcout << "prepare finished: " << this->chainLength << std::endl;
 }
 
@@ -32,21 +14,17 @@ void MarcowChain::setup( int chainLength, int hiddenStates ){
 	//Rcout << "prepare Object with long and short vectors: " << total << " ;"<< 
 	//  chainLength << std::endl;
 	this->chainLength = chainLength;
-	this->forwardResults.reserve( total );
-	this->backwardResults.reserve( total );
-	this->a_H.reserve( total );
-	this->p_H.reserve( total );
-	this->C.reserve( chainLength );
+	this->forwardResults.resize( total );
+	this->backwardResults.resize( total );
+	this->a_H.resize( total );
+	this->p_H.resize( total );
+	this->C.resize( chainLength );
 	double null = 0.0;
-	for ( int i = this->forwardResults.size(); i < total; i++ ){
-		 this->forwardResults.push_back( null );
-		 this->backwardResults.push_back( null );
-		 this->a_H.push_back( null );
-		 this->p_H.push_back( null );
-	}
-	for ( int i = this->C.size(); i < chainLength; i++ ) {
-		this->C.push_back( null );
-	}
+	std::fill(this->forwardResults.begin(), this->forwardResults.end(), null);
+	std::fill(this->backwardResults.begin(), this->backwardResults.end(), null);
+	std::fill(this->a_H.begin(), this->a_H.end(), null);
+	std::fill(this->p_H.begin(), this->p_H.end(), null);
+	std::fill(this->C.begin(), this->C.end(), null);
 }
 
 int MarcowChain::at( int id, int state ) {
@@ -64,11 +42,11 @@ NumericMatrix MarcowChain::run ( std::vector<double> chain, ProbList* model, boo
 		//::Rf_error("Not initialized correctly!") ;
 	}
 
-	//Rcout << "CalculateForwardProbability " << std::endl;
+	Rcout  << std::endl << "CalculateForwardProbability " << std::endl;
 	CalculateForwardProbability(chain, model);
-	//Rcout << "CalculateBackwardProbability " << std::endl;
+	Rcout << "CalculateBackwardProbability " << std::endl;
 	CalculateBackwardProbability(chain, model);
-	//Rcout << "CalculateTotalProbabilityFromStartToEnd " << std::endl;
+	Rcout << "CalculateTotalProbabilityFromStartToEnd " << std::endl;
 	CalculateTotalProbabilityFromStartToEnd(chain, model);
 	NumericMatrix ret;
 	if ( test ) {
@@ -156,7 +134,6 @@ void MarcowChain::CalculateForwardProbability( std::vector<double> chain, ProbLi
 				model->Prob_4_value(0, chain[0], state );
 	}
 	
-
 	for ( int i =1 ;i < chain.size(); i ++ ) {
 		//this forward C = (Last forward Prob C * p(C|C) + last forward Prob H * p(C|H) )
 		//                 * Prob_4_value( i, chain[i], 'C' )
@@ -186,12 +163,12 @@ void MarcowChain::CalculateForwardProbability( std::vector<double> chain, ProbLi
 				model->Prob_4_value( i, chain[i], state );
 			//Rcout << "forwardResults at () "<< i<< ", "<< state<<"="<< exp(this->forwardResults.at(at(i,state)))<<std::endl;
 		} 
-	}	
+	}
 }
 
 void MarcowChain::CalculateBackwardProbability( std::vector<double> chain, ProbList* model  ) {
 	
-	//this->backwardResults.reserve( chain.size() * model->states.size() );
+	//this->backwardResults.resize( chain.size() * model->states.size() );
 	int from;
 	int state;
 
@@ -232,9 +209,9 @@ void MarcowChain::CalculateBackwardProbability( std::vector<double> chain, ProbL
 }
 
 void MarcowChain::CalculateTotalProbabilityFromStartToEnd( std::vector<double> chain,  ProbList* model  ) {
-	//this->a_H.reserve( chain.size() * model->states.size() );
-	//this->p_H.reserve( chain.size() * model->states.size() );
-	//this->C.reserve( chain.size());
+	//this->a_H.resize( chain.size() * model->states.size() );
+	//this->p_H.resize( chain.size() * model->states.size() );
+	//this->C.resize( chain.size());
 	int state;
 	for ( int i =0; i < chain.size(); i++ ){
 		int id;

@@ -2,7 +2,7 @@ context( 'IceCream' )
 
 prefix= './';
 
-res = IceCreamTest()
+res = IceCreamTest( phony=FALSE)
 
 exp=read.delim( file.path( prefix, 'data', 'Eisner_run1.csv'))
 expect_equal(as.numeric(exp(res[,1])), as.numeric(as.vector(exp[,1])), label= colnames(exp)[1] )

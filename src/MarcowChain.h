@@ -1,9 +1,15 @@
+#ifndef MARKOWCHAIN_H
+#define MARKOWCHAIN_H
+
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <progress.hpp>
 #include <math.h>
 
 using namespace Rcpp;
+
+#include "ProbList.h"
+
 
 class MarcowChain{
 public:
@@ -37,3 +43,5 @@ public:
 	double Add2Logs (double logA, double logB ) ;
 
 };
+
+#endif

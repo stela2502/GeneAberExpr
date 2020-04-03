@@ -16,8 +16,8 @@ public:
 	std::vector<double> prob;
 
 	ProbEntry () {
-		this->start.reserve(10);
-		this->prob.reserve(0);
+		this->start.resize(10);
+		this->prob.resize(0);
 		::Rf_error("do never init like that!" );
 	};
 
@@ -26,8 +26,8 @@ public:
 			::Rf_error("the start sizes need to be exactly 10!" );
 		}
 
-		this->prob.reserve( this->s *2 ); // no one would use this without 2 states
-		this->start.reserve( this->s );
+		this->prob.resize( this->s *2 ); // no one would use this without 2 states
+		this->start.resize( this->s );
 		for ( int i = 0; i < this->s ; i++) {
 			this->start.push_back( starts[i] );
 			this->prob.push_back(0.0);
@@ -37,13 +37,13 @@ public:
 
 	void prepareIceCream(){
 		// start has already been set!		
-		this->start.reserve(10);
+		this->start.resize(10);
 		for ( int i = 1; i < 11; i++ ){
 			//Rcout << "ading ice start "<< i << " at id " << i-1 <<std::endl;
 			this->start[i-1] = i;
 		}
 
-		this->prob.reserve( 2 * this->s );
+		this->prob.resize( 2 * this->s );
 		for ( int i = 0; i < 2 * this->s; i++){
 			this->prob.push_back(0.0);
 		}
@@ -87,7 +87,7 @@ public:
 		//" and values size "<< values.size() << " for starte " << state <<std::endl;
 		
 		if ( this->prob.size() < state * this->s ){
-			this->prob.reserve( state * this->s );
+			this->prob.resize( state * this->s );
 			for ( int i = this->prob.size(); i <state * this->s; i ++ ){
 				this->prob.push_back(0.0);
 			}
@@ -266,10 +266,10 @@ public:
 
 	//method to fill the obejct with the ice cream data
 	void prepareIceCream () {
-		this->states.reserve(2);
+		this->states.resize(2);
 		this->states.push_back("Hot");
 		this->states.push_back("Cold");
-		this->list.reserve( 33 );
+		this->list.resize( 33 );
 		std::vector<double> range {1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0} ;
 		for ( int i =0; i< 33; i++) {
 			this->list.push_back(new ProbEntry( range ));
@@ -310,12 +310,12 @@ public:
 
 	void estimate( Eigen::SparseMatrix<double> data, std::vector<double> range, 
 		std::string name, bool phony ){
-		this->states.reserve(this->states.size() +1 );
+		this->states.resize(this->states.size() +1 );
 		this->states.push_back( name );
 
 		if (this->list.size() < data.innerSize() ){
 			// initialize the whole model
-			this->list.reserve( data.innerSize() );
+			this->list.resize( data.innerSize() );
 			for ( int i =this->list.size(); i < data.innerSize(); i++){
 				this->list.push_back( new ProbEntry(range) ) ;
 			}
@@ -345,7 +345,7 @@ public:
 		std::vector<double> range, std::string name, bool phony ){
 		
 		if ( this->states.size() == 0 ){
-			this->list.reserve( data.innerSize() );
+			this->list.resize( data.innerSize() );
 			//std::generate(this->list.begin(), this->list.end() , &ProbEntry(Range) );
 			for( int i = 0; i < data.innerSize(); i ++){
 				this->list.push_back( new ProbEntry( range ) ) ;

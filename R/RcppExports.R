@@ -54,10 +54,11 @@ GetTestModel <- function(data, range, interest, background, phony) {
 #' @rdname IceCreamTest
 #' @description the publication 'An Interactive Spreadsheet for Teaching the Forward-Backward Algorithm'
 #' is a beatuful example of how to calculate an HMM. This function re-runs the excel data.
+#' @param phony print status messages (default false)
 #' @return a matrix with the HMM internals (at the moment)
 #' @export
-IceCreamTest <- function() {
-    .Call(`_GeneAberExpr_IceCreamTest`)
+IceCreamTest <- function(phony) {
+    .Call(`_GeneAberExpr_IceCreamTest`, phony)
 }
 
 #' @title goodGenes processes the Ice cream HMM example
@@ -70,3 +71,7 @@ goodGenes <- function(data, max) {
     .Call(`_GeneAberExpr_goodGenes`, data, max)
 }
 
+# Register entry points for exported C++ functions
+methods::setLoadAction(function(ns) {
+    .Call('_GeneAberExpr_RcppExport_registerCCallable', PACKAGE = 'GeneAberExpr')
+})

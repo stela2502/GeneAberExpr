@@ -12,13 +12,56 @@ expect_equal( table(goodGenes(testD, max)), table( c(rep( FALSE, 37) , rep(TRUE,
 
 testD= testD[ goodGenes(testD, max),]
 
-model = GetTestModel( testD, seq( min, max,(max - min)/9 ) ,as.integer(1:100), as.integer(101:200), phony=TRUE)
+model = GetTestModel( testD, seq( min, max,(max - min)/9 ) ,as.integer(1:100), 
+	as.integer(101:200), phony=FALSE)
+
+
+getSimple <- function(x, range, at ){
+	x = x[at]
+	ret = vector(mode="numeric", length=length(range) )
+	for ( i in 2:(length(range)) ){
+		rem = which( x < range[i] )
+		ret[i-1] = length(rem);
+		if ( length(rem) > 0 ){
+			x = x[-rem]
+		}
+	}
+	ret[length(range)] = length(x)
+	ret
+}
+
+getVals <- function(x, range, at){
+	ret = getSimple(x, range, at)
+
+	m = min(ret)
+
+	ret = ((ret - m) / sum(ret)) + 1e-9
+	log(ret)
+}
+
+for( i in  seq(2, nrow(model),2) ) {
+	expect_equal ( 
+		as.vector( model[i,]), 
+		getVals( as.vector(testD[i/2, ]),seq( min, max,(max - min)/9 ),101:200),
+		info= paste('bad bg model row', i) )
+}
+
+
+for( i in  seq(1, nrow(model),2) ) {
+	expect_equal ( 
+		as.vector( model[i,]), 
+		getVals( 
+			as.vector(testD[ceiling(i/2), ]),
+			seq( min, max,(max - min)/9 ),
+			1:100
+		), info= paste('bad int model row', i) )
+}
 
 
 calcCancerCount2 <- function(x) {
 	 length(which(x > .9999))
 }
-expect_true ( round(sum(calcQuality (model) ),4) ==  268.7359)
+expect_true ( round(sum(calcQuality (model) ),0) ==  1819581)
 
 #[1] 0.005600354 #max
 #[1] 0.01155574  #quant 99
@@ -29,7 +72,7 @@ expect_true ( round(sum(calcQuality (model) ),4) ==  268.7359)
 #lines(res[2,], col='green')
 
 res1 = IdentifyStatesTest( testD, seq( min, max,(max - min)/9 ) ,
-	as.integer(1:100), as.integer(101:200), TRUE)
+	as.integer(1:100), as.integer(101:200), phony=FALSE)
 
 load(file.path( prefix,'data','red.RData'))
 
@@ -38,24 +81,7 @@ expect_equal( res1, res, label = 'HMM real live results')
 ## now the thing is at least not breaking all the time!
 ## look for logics problems!
 
-skip("not test relevant")
 
-res2 = IdentifyStates( testD, seq( min, max,(max - min)/9 ) ,
-	as.integer(1:100), as.integer(101:200), TRUE)
-cancerCount = calcCancerCount(res2 )
-
-boxplot( split( cancerCount, c(rep('cancer', 100), rep('healthy', 100))), main="Full Model")
-
-quality =calcQuality( model )
-
-res3 = IdentifyStates( testD[ sort(order(quality,decreasing=T)[1:800]),], seq( min, max,(max - min)/9 ) ,as.integer(1:100), as.integer(101:200))
-
-cancerCount2 = calcCancerCount( res3 )
-
-x11()
-boxplot( split( cancerCount2, c(rep('cancer', 100), rep('healthy', 100))), main="Partial Model")
-
-## the partial model it is then :-(
 
 
 

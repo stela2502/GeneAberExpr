@@ -1,30 +1,67 @@
 
-#include "../inst/include/GeneAberExpr.h"
+#include "ProbList.h"
 
 
-void ProbList::prepareIceCream () {
-	this->states.reserve(2);
-	this->states.push_back("Hot");
-	this->states.push_back("Cold");
-	this->list.reserve( 33 );
-	std::vector<double>  range({ 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0});
-	this->starts = range;
-	//std::iota(range.begin(), range.end(), 1);
+ProbList::ProbList (int marcowLength, int states, std::vector<double> * s ){
+	setup(marcowLength, states, s );
+}
+
+void ProbList::setup( int marcowLength, int states, std::vector<double> * s ){
+	if ( this->list.size() > 0 ){
+		Rcpp::stop("ProbList must not be set up twice!" );
+	}
+	this->starts = s;
+	this->states.reserve(states);
+	this->list.reserve(marcowLength);
+
+	//Rcout << "ProbList::ProbList( int, int): [end]" << std::endl;
+	this->transmissionProb = new TransmissionProb( states );
+
+	//Rcout << "ProbList::ProbList( int, int): [-1]" << std::endl;
+	for ( int i = 0; i < marcowLength; i ++ ) {
+		//Rcout << "ProbList::ProbList( int, int): ["<<i<<"]" << std::endl;
+		ProbEntry * tmp = new ProbEntry( s, states);
+		this->list.push_back(tmp);
+	}
+}
+
+
+void ProbList::prepareIceCream (bool phony) {
+
+	if ( phony) {
+		Rcout << "ProbList::prepareIceCream:" << std::endl;
+	}
+	std::vector<double> range(10);
+	std::iota(range.begin(), range.end(), 1.0);
+
+	setup( 33, 2, &range );
+
+	if ( phony) {
+		Rcout << "Setup finished:" << std::endl;
+	}
+	this->states.push_back ("Hot");
+	this->states.push_back ("Cold");
+
+	
+	this->transmissionProb->prepareIceCream(phony);
+	
+	if ( phony) {	
+		Rcout << "Initialize the ProbEntries list :" << std::endl;
+	}
 	//this->starts = { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0};
 	for ( int i =0; i< 33; i++) {
-		this->list.push_back(new ProbEntry( range ));
-			//Rcout << "ProbEntry add to object "<<i << " size: " << this->list.size() << std::endl;
-		this->list[ i ]-> prepareIceCream();
+		this->list.at(i)-> prepareIceCream(phony);
+		//Rcout << "ProbEntry add to object "<<i << "          ID: "<< this->list.at(i) << std::endl;
+		//this->list.at(i)->print();
 	}
-		//Rcout << "ProbEntry locations -> "; 
-		//for ( int i = 0; i < 33; i++){
-		//	Rcout << this->list[i] << " ";
-		//}
-		//Rcout << std::endl;
-
-	this->transmissionProb = new TransmissionProb(2);
-	this->transmissionProb->prepareIceCream();
-		//print();
+	if ( phony) {
+		Rcout << "ProbList list ptm's: ";
+		for ( int i =0; i < 33; i++) {
+			Rcout << this->list.at(i) << " ";
+		}
+		Rcout << "ProbList::prepareIceCream <model>:" << std::endl;
+		print();
+	}
 }
 
 
@@ -45,15 +82,14 @@ NumericMatrix ProbList::as_Matrix ( ) {
 				//Rcout << "result line " << r_ << " of " << this->list.size() * this->states.size()<< std::endl;
 			for ( int id = 0; id < this->list[0]->s; id ++){
 					//Rcout << "   result line "<< r_ << " and id "<< id <<std::endl;
-				ret(r_, id) = this->list[i]->prob[
-				 this->list[i]->pos4val( this->starts[id], state)];
+				ret(r_, id) = Prob_4_value(i, this->starts->at(id), state);
 			}
 			rn(r_) = std::to_string(i) + this->states[state];
 			r_ ++;
 		}
 	}
 	for ( int id = 0; id < this->list[0]->s; id++){
-		cn(id) = std::to_string(this->starts[id]);
+		cn(id) = std::to_string(this->starts->at(id));
 	}
 	colnames( ret ) = cn;
 	rownames( ret ) = rn;
@@ -65,17 +101,9 @@ NumericMatrix ProbList::as_Matrix ( ) {
 void ProbList::estimate( Eigen::SparseMatrix<double> data, std::vector<double> range, 
 	std::string name, bool phony ){
 
-	this->states.reserve(this->states.size() +1 );
-	this->states.push_back( name );
-	
-
-	if (this->list.size() < data.innerSize() ){
-		this->starts = range;
-			// initialize the whole model
-		this->list.reserve( data.innerSize() );
-		for ( int i =this->list.size(); i < data.innerSize(); i++){
-			this->list.push_back( new ProbEntry(range) ) ;
-		}
+	try {this->states.push_back( name );}
+	catch( const std::exception& e ){
+		Rcpp::stop("The ProbeList has not been initialized to contain that much information!");
 	}
 
 	std::vector<double> D (data.outerSize());
@@ -101,16 +129,11 @@ void ProbList::estimate( Eigen::SparseMatrix<double> data, std::vector<double> r
 void ProbList::estimate( Eigen::SparseMatrix<double> data, std::vector<int> cols,
 	std::vector<double> range, std::string name, bool phony ){
 
-	if ( this->states.size() == 0 ){
-		this->starts = range;
-		this->list.reserve( data.innerSize() );
-			//std::generate(this->list.begin(), this->list.end() , &ProbEntry(Range) );
-		for( int i = 0; i < data.innerSize(); i ++){
-			this->list.push_back( new ProbEntry( range ) ) ;
-		}
+	try {this->states.push_back( name );}
+	catch( const std::exception& e ){
+		Rcpp::stop("The ProbeList has not been initialized to contain that much information!");
 	}
-		//this->print();
-	this->states.push_back( name );
+	
 
 	std::vector<double> D (data.outerSize());
 	std::vector<double> A ( cols.size() );
@@ -118,17 +141,10 @@ void ProbList::estimate( Eigen::SparseMatrix<double> data, std::vector<int> cols
 	if ( phony ) {
 		Rcout << "estimating probabilities for state " << name << " ("<< this->states.size() << ")" << std::endl;
 	}
-		/*
-		if ( this->states.size() > 1 ){
-			this->list.at(0)->print();
-		}
-		*/
 
 	Progress p(data.innerSize(), phony);
 	data = data.transpose();
 
-		//Rcout << "just before the for loop " << std::endl;
-		//this->print();
 
 	for ( int c_=0; c_ < data.outerSize(); ++c_ ){
 		std::fill(D.begin(), D.end(), 0.0);
@@ -138,30 +154,27 @@ void ProbList::estimate( Eigen::SparseMatrix<double> data, std::vector<int> cols
 		for ( int i =0; i < cols.size(); i++){
 			A[i] = D[cols[i]]; 
 		}
-		this->list.at(c_)->estimate( A, this->states.size()-1);
 		try {
-				//Rcout << "At position " << c_ << std::endl;
-				//this->list.at(c_)->print();
 			this->list.at(c_)->estimate( A, this->states.size()-1);
-				//this->list.at(c_)->print();
 		}
 		catch (const std::out_of_range& oor) {
-			Rcout << "At position " << c_ << " you tried to use an uninitialized object" << std::endl;
-			::Rf_error("Creating a ProbEntry object?! NOT HERE!") ;
-  				//Rcout << "object creation fincished" << std::endl;
+			Rcpp::stop("At position " +std::to_string(c_)+" you tried to use an uninitialized object" ) ;
 		}
- 			//Rcout << "results prob functions length " << this->list[c_]->prob.size() << std::endl;
+	
 		p.increment();
 	}
-
-		//Rcout << "results prob functions length " << this->list[0]->prob.size() << std::endl;
-		//Rcout << "state " << name << " finished" << std::endl;
 }
+
 double ProbList::Prob_4_value ( int i, double val, int state) {
-	return (log(list[i]->Prob_4_value( val, state )));
+	try{
+		return (log(this->list.at(i)->Prob_4_value_e( val, state )));
+	}
+	catch( const std::exception& e ){
+		Rcpp::stop("exception: list.at(i="+ std::to_string(i) + ") Prob_4_value_e: " + e.what() );
+	}
 }
 double ProbList::Prob_4_value ( double val, int state) {
-	return (log (list[0]->Prob_4_value( val, state )) );
+	return (log (this->list.at(0)->Prob_4_value_e( val, state )) );
 }
 void ProbList::print (){
 	Rcout << "A c++ ProbList object containing"  << std::endl;
@@ -170,7 +183,7 @@ void ProbList::print (){
 		Rcout << "'" <<this->states[i] <<  "' ";
 	}
 	Rcout << std::endl;
-	this->transmissionProb->print();
+	this->transmissionProb->print( this->states );
 	Rcout << "prob distributions (n="<< this->list.size()<<  "):" << std::endl;		
 	for ( int i = 0; i < 5; i++) {
 		try {

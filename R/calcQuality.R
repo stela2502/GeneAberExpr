@@ -19,11 +19,9 @@
 #'
 #' @docType package
 #' @name GeneAberExpr
-#' @useDynLib GeneAberExpr
+#' @useDynLib GeneAberExpr, .registration=TRUE
+#' @importFrom Rcpp sourceCpp
 
-NULL;
-
-#' @importFrom Rcpp evalCpp
 NULL;
 
 #' @name calcQuality

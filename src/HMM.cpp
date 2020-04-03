@@ -1,11 +1,19 @@
-
+// [[Rcpp::interfaces(r, cpp)]]
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <progress.hpp>
 #include <math.h>
 
-#include "../inst/include/GeneAberExpr.h"
+#include "MarcowChain.h"
+
+
+std::vector<int> minusOne ( std::vector<int>  X ){
+	for ( unsigned int i = 0; i < X.size(); i ++) {
+		X.at(i) --;
+	}
+	return X;
+}
 
 
 // here I need to allow R to run a HMM analysis.
@@ -14,8 +22,6 @@
 // all probability estimations are in the <ProbList> class.
 // get a functional one with ProbList( <sparseMatrix>, idsA, idsB, starts )
 // the starts should range from min to max of the matrix.
-
-
 //' @title IdentifyStates tries to infere cell states from a sparse Matrix and a list of example cells.
 //' @aliases IdentifyStates,GeneAberExpr-method
 //' @rdname IdentifyStates
@@ -32,14 +38,18 @@
 NumericMatrix IdentifyStates ( Eigen::SparseMatrix<double> data, std::vector<double> range,  std::vector<int> interest,
 		std::vector<int> background, bool phony ){
 
-	ProbList* model = new ProbList(); // 10 by default!
-	Rcout << "estimating 'interest' probability functions " << std::endl;
+	ProbList* model = new ProbList(data.innerSize(), 2, & range ); // 10 by default!
+	if ( phony) {
+		Rcout << std::endl << "estimating 'interest' probability functions " << std::endl;
+	}
 	std::string a ="interest";
-	model->estimate( data, interest, range, a, phony );
+	model->estimate( data, minusOne(interest), range, a, phony );
 
-	Rcout << "estimating 'background' probability functions " << std::endl;
+	if ( phony) {
+		Rcout << "estimating 'background' probability functions " << std::endl;
+	}
 	a = "Background";
-	model->estimate( data, background, range, a, phony );
+	model->estimate( data, minusOne(background), range, a, phony );
 
 	model->transmissionProb = new TransmissionProb( 2 );
 	//transmissionProb
@@ -55,7 +65,9 @@ NumericMatrix IdentifyStates ( Eigen::SparseMatrix<double> data, std::vector<dou
 
 	NumericMatrix tmp;
 	MarcowChain* mc;
-	Rcout << "Create MarcowChain object " << std::endl;
+	if ( phony) {
+		Rcout << "Create MarcowChain object " << std::endl;
+	}
 	mc = new MarcowChain ( data.innerSize(), 2);
 	std::vector<double>D ( data.innerSize() );
 
@@ -79,7 +91,9 @@ NumericMatrix IdentifyStates ( Eigen::SparseMatrix<double> data, std::vector<dou
 		}
 		
 	}
-
+	delete model;
+	delete mc;
+	delete &modFac;
 	return ( ret );
 }
 
@@ -100,14 +114,14 @@ NumericMatrix IdentifyStates ( Eigen::SparseMatrix<double> data, std::vector<dou
 NumericMatrix IdentifyStatesTest ( Eigen::SparseMatrix<double> data, std::vector<double> range,  std::vector<int> interest,
 		std::vector<int> background, bool phony ){
 
-	ProbList* model = new ProbList(); // 10 by default!
+	ProbList* model = new ProbList( static_cast<int>(data.innerSize()), 2, &range ); // 10 by default!
 	Rcout << "estimating 'interest' probability functions " << std::endl;
 	std::string a ="interest";
-	model->estimate( data, interest, range, a, phony );
+	model->estimate( data, minusOne(interest), range, a, phony );
 
 	Rcout << "estimating 'background' probability functions " << std::endl;
 	a = "Background";
-	model->estimate( data, background, range, a , phony);
+	model->estimate( data, minusOne(background), range, a , phony);
 
 	model->transmissionProb = new TransmissionProb( 2 );
 	//transmissionProb
@@ -135,6 +149,8 @@ NumericMatrix IdentifyStatesTest ( Eigen::SparseMatrix<double> data, std::vector
 		D[it.row()] =  it.value();
 	}
 	tmp = mc->run( D, model, false); // returns only the p values not log!
+	delete model;
+	delete mc;
 	return(tmp);
 	
 
@@ -157,21 +173,20 @@ NumericMatrix GetTestModel ( Eigen::MappedSparseMatrix<double> data, std::vector
 		std::vector<int> background, bool phony){
 
 
-	ProbList* model = new ProbList(); // 10 by default!
+	ProbList* model = new ProbList( static_cast<int>(data.innerSize()), 2, &range );
 	if ( phony ){
 		Rcout << "estimating 'interest' probability functions " << std::endl;
 	}
 	std::string a ="interest";
-	model->estimate( data, interest, range, a, phony );
+	model->estimate( data, minusOne(interest), range, a, phony );
 
 	//model->list.at(1)->print();
-
 	//model->print();
 	if ( phony ){
 		Rcout << "estimating 'background' probability functions " << std::endl;
 	}
 	a = "Background";
-	model->estimate( data, background, range, a, phony );
+	model->estimate( data, minusOne(background), range, a, phony );
 
 	//model->print();
 	if ( phony ){
@@ -181,7 +196,6 @@ NumericMatrix GetTestModel ( Eigen::MappedSparseMatrix<double> data, std::vector
 	model->transmissionProb = new TransmissionProb( 2 );
 	//transmissionProb
 	std::vector<double> start = {0.5, 0.5};
-	//Rcout << "add starts vector of size " << start.size()<<  std::endl;
 	model->transmissionProb->setStart ( start );
 	model->transmissionProb->setEnd   ( start );
 	// from Interest to Interest and to Background
@@ -196,6 +210,7 @@ NumericMatrix GetTestModel ( Eigen::MappedSparseMatrix<double> data, std::vector
 	}
 	NumericMatrix ret;
 	ret = model->as_Matrix();
+	delete model;
 	return ( ret ) ;
 }
 
@@ -205,37 +220,58 @@ NumericMatrix GetTestModel ( Eigen::MappedSparseMatrix<double> data, std::vector
 //' @rdname IceCreamTest
 //' @description the publication 'An Interactive Spreadsheet for Teaching the Forward-Backward Algorithm'
 //' is a beatuful example of how to calculate an HMM. This function re-runs the excel data.
+//' @param phony print status messages (default false)
 //' @return a matrix with the HMM internals (at the moment)
 //' @export
 // [[Rcpp::export]]
-NumericMatrix IceCreamTest ( ){
+NumericMatrix IceCreamTest (  bool phony ){
 
-	ProbList* model = new ProbList(); // 10 by default!
-	//Rcout << "preparing probability functions" << std::endl;
-	model->prepareIceCream();
+	if ( phony) {
+		Rcout << "IceCreamTest:" << std::endl;
+	}
+	std::vector<double> starts(10);
+	starts  = { 1.0, 2.0, 3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0 };
+	ProbList* model = new ProbList( ); // 10 by default!
+	if ( phony) {
+		Rcout << "preparing probability functions" << std::endl;
+	}
+	model->prepareIceCream(phony);
+	if ( phony) {
+		Rcout << "The HMM stored starts vector looks like that ("<< &starts<<"):" << std::endl;
+
+		for (int i = 0; i < 10; i++ ){
+			Rcout << starts[i] << " ";
+		}
+		Rcout << std::endl;
+
+		Rcout << "The first ProbeEntry's internals: ("<< model->list[0] << ")" <<std::endl;
+	
+		Rcout << "the length of the probability vector should be 20! and it is: " <<model->list.at(1)->prob.size() << std::endl;
+	}
 	NumericMatrix ret;
-	//Rcout << "preparing probability functions 2" << std::endl;
-
-	//ret = model->as_Matrix();
-	//return (ret);
-
+	if ( phony) {
+		Rcout << "preparing probability functions 2" << std::endl;
+	}
 	std::vector<double> ice { 2.0, 3.0, 3.0, 2.0, 3.0, 2.0, 3.0, 2.0, 2.0, 3.0, 1.0, 3.0, 3.0,
 		1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 3.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0, 3.0, 3.0, 2.0, 
 		3.0, 2.0,2.0 };
-
-	//Rcout << "transition prob H->H .8 " << exp(model->transmissionProb->getTransmissionProb( 1, 1 ))<< std::endl;
-	//Rcout << "transition prob H->C .1 " << exp(model->transmissionProb->getTransmissionProb( 1, 0 ))<< std::endl;
-	//Rcout << "transition prob H->H .8 " << exp(model->transmissionProb->getTransmissionProb( 0, 0 ))<< std::endl;
-	//Rcout << "transition prob C->H .1 " << exp(model->transmissionProb->getTransmissionProb( 0, 1 ))<< std::endl;
-
+	if ( phony) {
+		Rcout << "transition prob H->H .8 " << exp(model->transmissionProb->getTransmissionProb( 1, 1 ))<< std::endl;
+		Rcout << "transition prob H->C .1 " << exp(model->transmissionProb->getTransmissionProb( 1, 0 ))<< std::endl;
+		Rcout << "transition prob H->H .8 " << exp(model->transmissionProb->getTransmissionProb( 0, 0 ))<< std::endl;
+		Rcout << "transition prob C->H .1 " << exp(model->transmissionProb->getTransmissionProb( 0, 1 ))<< std::endl;
+	}
 
 
 	MarcowChain* mc;
-	//Rcout << "Create MarcovChain object " << std::endl;
+	if ( phony) {
+		Rcout << "Create MarcovChain object " << std::endl;
+	}
 	mc = new MarcowChain ( 33, 2);
 
-	//Rcout << "Process iteration 1" << mc->chainLength << std::endl;
-
+	if ( phony) {
+		Rcout << "Process iteration 1 for " << mc->chainLength << " days" <<std::endl;
+	}
 	ret = mc->run( ice, model, true ); // test returning all internal values
 
 	return ( ret ) ;

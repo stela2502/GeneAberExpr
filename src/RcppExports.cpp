@@ -4,15 +4,16 @@
 #include "../inst/include/GeneAberExpr.h"
 #include <RcppEigen.h>
 #include <Rcpp.h>
+#include <string>
+#include <set>
 
 using namespace Rcpp;
 
 // IdentifyStates
 NumericMatrix IdentifyStates(Eigen::SparseMatrix<double> data, std::vector<double> range, std::vector<int> interest, std::vector<int> background, bool phony);
-RcppExport SEXP _GeneAberExpr_IdentifyStates(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP, SEXP phonySEXP) {
+static SEXP _GeneAberExpr_IdentifyStates_try(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP, SEXP phonySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Eigen::SparseMatrix<double> >::type data(dataSEXP);
     Rcpp::traits::input_parameter< std::vector<double> >::type range(rangeSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type interest(interestSEXP);
@@ -20,14 +21,37 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type phony(phonySEXP);
     rcpp_result_gen = Rcpp::wrap(IdentifyStates(data, range, interest, background, phony));
     return rcpp_result_gen;
-END_RCPP
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _GeneAberExpr_IdentifyStates(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP, SEXP phonySEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_GeneAberExpr_IdentifyStates_try(dataSEXP, rangeSEXP, interestSEXP, backgroundSEXP, phonySEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
 }
 // IdentifyStatesTest
 NumericMatrix IdentifyStatesTest(Eigen::SparseMatrix<double> data, std::vector<double> range, std::vector<int> interest, std::vector<int> background, bool phony);
-RcppExport SEXP _GeneAberExpr_IdentifyStatesTest(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP, SEXP phonySEXP) {
+static SEXP _GeneAberExpr_IdentifyStatesTest_try(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP, SEXP phonySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Eigen::SparseMatrix<double> >::type data(dataSEXP);
     Rcpp::traits::input_parameter< std::vector<double> >::type range(rangeSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type interest(interestSEXP);
@@ -35,14 +59,37 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type phony(phonySEXP);
     rcpp_result_gen = Rcpp::wrap(IdentifyStatesTest(data, range, interest, background, phony));
     return rcpp_result_gen;
-END_RCPP
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _GeneAberExpr_IdentifyStatesTest(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP, SEXP phonySEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_GeneAberExpr_IdentifyStatesTest_try(dataSEXP, rangeSEXP, interestSEXP, backgroundSEXP, phonySEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
 }
 // GetTestModel
 NumericMatrix GetTestModel(Eigen::MappedSparseMatrix<double> data, std::vector<double> range, std::vector<int> interest, std::vector<int> background, bool phony);
-RcppExport SEXP _GeneAberExpr_GetTestModel(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP, SEXP phonySEXP) {
+static SEXP _GeneAberExpr_GetTestModel_try(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP, SEXP phonySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Eigen::MappedSparseMatrix<double> >::type data(dataSEXP);
     Rcpp::traits::input_parameter< std::vector<double> >::type range(rangeSEXP);
     Rcpp::traits::input_parameter< std::vector<int> >::type interest(interestSEXP);
@@ -50,37 +97,133 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type phony(phonySEXP);
     rcpp_result_gen = Rcpp::wrap(GetTestModel(data, range, interest, background, phony));
     return rcpp_result_gen;
-END_RCPP
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _GeneAberExpr_GetTestModel(SEXP dataSEXP, SEXP rangeSEXP, SEXP interestSEXP, SEXP backgroundSEXP, SEXP phonySEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_GeneAberExpr_GetTestModel_try(dataSEXP, rangeSEXP, interestSEXP, backgroundSEXP, phonySEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
 }
 // IceCreamTest
-NumericMatrix IceCreamTest();
-RcppExport SEXP _GeneAberExpr_IceCreamTest() {
+NumericMatrix IceCreamTest(bool phony);
+static SEXP _GeneAberExpr_IceCreamTest_try(SEXP phonySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(IceCreamTest());
+    Rcpp::traits::input_parameter< bool >::type phony(phonySEXP);
+    rcpp_result_gen = Rcpp::wrap(IceCreamTest(phony));
     return rcpp_result_gen;
-END_RCPP
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _GeneAberExpr_IceCreamTest(SEXP phonySEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_GeneAberExpr_IceCreamTest_try(phonySEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
 }
 // goodGenes
 std::vector<bool> goodGenes(Eigen::SparseMatrix<double> data, double max);
-RcppExport SEXP _GeneAberExpr_goodGenes(SEXP dataSEXP, SEXP maxSEXP) {
+static SEXP _GeneAberExpr_goodGenes_try(SEXP dataSEXP, SEXP maxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Eigen::SparseMatrix<double> >::type data(dataSEXP);
     Rcpp::traits::input_parameter< double >::type max(maxSEXP);
     rcpp_result_gen = Rcpp::wrap(goodGenes(data, max));
     return rcpp_result_gen;
-END_RCPP
+END_RCPP_RETURN_ERROR
+}
+RcppExport SEXP _GeneAberExpr_goodGenes(SEXP dataSEXP, SEXP maxSEXP) {
+    SEXP rcpp_result_gen;
+    {
+        Rcpp::RNGScope rcpp_rngScope_gen;
+        rcpp_result_gen = PROTECT(_GeneAberExpr_goodGenes_try(dataSEXP, maxSEXP));
+    }
+    Rboolean rcpp_isInterrupt_gen = Rf_inherits(rcpp_result_gen, "interrupted-error");
+    if (rcpp_isInterrupt_gen) {
+        UNPROTECT(1);
+        Rf_onintr();
+    }
+    bool rcpp_isLongjump_gen = Rcpp::internal::isLongjumpSentinel(rcpp_result_gen);
+    if (rcpp_isLongjump_gen) {
+        Rcpp::internal::resumeJump(rcpp_result_gen);
+    }
+    Rboolean rcpp_isError_gen = Rf_inherits(rcpp_result_gen, "try-error");
+    if (rcpp_isError_gen) {
+        SEXP rcpp_msgSEXP_gen = Rf_asChar(rcpp_result_gen);
+        UNPROTECT(1);
+        Rf_error(CHAR(rcpp_msgSEXP_gen));
+    }
+    UNPROTECT(1);
+    return rcpp_result_gen;
+}
+
+// validate (ensure exported C++ functions exist before calling them)
+static int _GeneAberExpr_RcppExport_validate(const char* sig) { 
+    static std::set<std::string> signatures;
+    if (signatures.empty()) {
+        signatures.insert("NumericMatrix(*IdentifyStates)(Eigen::SparseMatrix<double>,std::vector<double>,std::vector<int>,std::vector<int>,bool)");
+        signatures.insert("NumericMatrix(*IdentifyStatesTest)(Eigen::SparseMatrix<double>,std::vector<double>,std::vector<int>,std::vector<int>,bool)");
+        signatures.insert("NumericMatrix(*GetTestModel)(Eigen::MappedSparseMatrix<double>,std::vector<double>,std::vector<int>,std::vector<int>,bool)");
+        signatures.insert("NumericMatrix(*IceCreamTest)(bool)");
+        signatures.insert("std::vector<bool>(*goodGenes)(Eigen::SparseMatrix<double>,double)");
+    }
+    return signatures.find(sig) != signatures.end();
+}
+
+// registerCCallable (register entry points for exported C++ functions)
+RcppExport SEXP _GeneAberExpr_RcppExport_registerCCallable() { 
+    R_RegisterCCallable("GeneAberExpr", "_GeneAberExpr_IdentifyStates", (DL_FUNC)_GeneAberExpr_IdentifyStates_try);
+    R_RegisterCCallable("GeneAberExpr", "_GeneAberExpr_IdentifyStatesTest", (DL_FUNC)_GeneAberExpr_IdentifyStatesTest_try);
+    R_RegisterCCallable("GeneAberExpr", "_GeneAberExpr_GetTestModel", (DL_FUNC)_GeneAberExpr_GetTestModel_try);
+    R_RegisterCCallable("GeneAberExpr", "_GeneAberExpr_IceCreamTest", (DL_FUNC)_GeneAberExpr_IceCreamTest_try);
+    R_RegisterCCallable("GeneAberExpr", "_GeneAberExpr_goodGenes", (DL_FUNC)_GeneAberExpr_goodGenes_try);
+    R_RegisterCCallable("GeneAberExpr", "_GeneAberExpr_RcppExport_validate", (DL_FUNC)_GeneAberExpr_RcppExport_validate);
+    return R_NilValue;
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_GeneAberExpr_IdentifyStates", (DL_FUNC) &_GeneAberExpr_IdentifyStates, 5},
     {"_GeneAberExpr_IdentifyStatesTest", (DL_FUNC) &_GeneAberExpr_IdentifyStatesTest, 5},
     {"_GeneAberExpr_GetTestModel", (DL_FUNC) &_GeneAberExpr_GetTestModel, 5},
-    {"_GeneAberExpr_IceCreamTest", (DL_FUNC) &_GeneAberExpr_IceCreamTest, 0},
+    {"_GeneAberExpr_IceCreamTest", (DL_FUNC) &_GeneAberExpr_IceCreamTest, 1},
     {"_GeneAberExpr_goodGenes", (DL_FUNC) &_GeneAberExpr_goodGenes, 2},
+    {"_GeneAberExpr_RcppExport_registerCCallable", (DL_FUNC) &_GeneAberExpr_RcppExport_registerCCallable, 0},
     {NULL, NULL, 0}
 };
 

@@ -1,3 +1,5 @@
+#ifndef PROBLIST_H
+#define PROBLIST_H
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
@@ -6,20 +8,29 @@
 
 using namespace Rcpp;
 
+#include "ProbEntry.h"
+#include "TransmissionProb.h"
+
+
 class ProbList {
 public:
 
-	std::vector<ProbEntry*> list;
+
 	TransmissionProb* transmissionProb;
+	std::vector<ProbEntry*> list;
 	//a vector of chars with max 10 entries...
 	std::vector<std::string> states;
 
-	std::vector<double>  starts;
+	std::vector<double> * starts;
 
-	ProbList ();
+	ProbList () {};
+
+	ProbList (int marcowLength, int states, std::vector<double> * s );
+
+	void setup(int marcowLength, int states, std::vector<double> * s );
 
 	//method to fill the obejct with the ice cream data
-	void prepareIceCream ();
+	void prepareIceCream (bool phony);
 
 	//std::vector<double> getStarts( );
 
@@ -37,3 +48,4 @@ public:
 
 };
 
+#endif
